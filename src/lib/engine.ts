@@ -9,15 +9,29 @@ import { OBJECTIVES, ERRORS, ASSESSMENTS, STRATEGIES, TOOLS, HOMEWORK } from "..
 import { formatDateArabic } from "./utils";
 
 /**
- * Builds smart pedagogical stages based on subject and grade
+ * Builds smart pedagogical stages based on subject, grade, and selected strategy
  */
-function getSmartStages(subject: string, grade: string, duration: number, lessonType: string): LessonPlanStage[] {
-  const G = parseInt(grade);
+function getSmartStages(form: LessonPlanForm): LessonPlanStage[] {
+  const G = parseInt(form.grade);
+  const duration = parseInt(form.duration);
+  const subject = form.subject;
+  const alphaKey = form.alphaStrategy;
+
   const T = duration === 35
     ? { intro: 6, present: 14, practice: 10, assess: 5 }
     : { intro: 5, present: 12, practice: 8, assess: 5 };
 
   const close = ["استنتاج القاعدة النهائية", "سؤال 'تحدي ألفا' سريع", "توزيع نقاط التميز", "تحديد مهمة الواجب"];
+
+  // If "Stations" (محطات التعلم) is selected, force a specific structure
+  if (alphaKey === 'stations') {
+    return [
+      { name: "التهيئة والتدشين", t: T.intro, acts: ["توزيع الطلاب على المحطات", "شرح ميثاق العمل الجماعي", "تحديد هدف الرحلة الاستكشافية"], color: "#e0f2fe" },
+      { name: "دوران المحطات (الجزء 1)", t: T.present, acts: ["محطة الفهم: استخراج الظاهرة", "محطة الإبداع: رسم/تجسيد المفهوم", "محطة التحدي: حل لغز لغوي"], color: "#f0fdf4" },
+      { name: "دوران المحطات (الجزء 2)", t: T.practice, acts: ["تبادل الأدوار بين المجموعات", "تصحيح الأقران تحت إشراف المعلم", "تجميع مخرجات المحطات"], color: "#fefce8" },
+      { name: "المؤتمر الختامي", t: T.assess, acts: ["عرض نتائج المجموعات", ...close], color: "#fdf2f8" },
+    ];
+  }
 
   // Logic per subject
   if (subject === 'grammar') {
@@ -111,11 +125,12 @@ export function buildPlan(form: LessonPlanForm): LessonPlan {
     objectives,
     strategies: STRATEGIES[form.subject]?.[gn] || [],
     tools: TOOLS[form.subject]?.[gn] || [],
-    stages: getSmartStages(form.subject, form.grade, parseInt(form.duration), ltk),
+    stages: getSmartStages(form),
     alphaStrategy: ALPHA_STRATEGIES[ask as keyof typeof ALPHA_STRATEGIES]?.label || "",
     alphaDesc: ALPHA_STRATEGIES[ask as keyof typeof ALPHA_STRATEGIES]?.desc || "",
     introLabel: INTRO_TYPES[itk as keyof typeof INTRO_TYPES]?.label || "",
     introEx: INTRO_TYPES[itk as keyof typeof INTRO_TYPES]?.ex || "",
+    introDesc: (INTRO_TYPES[itk as keyof typeof INTRO_TYPES] as any)?.ex || "",
     lessonTypeLabel: LESSON_TYPES[ltk as keyof typeof LESSON_TYPES]?.label || "",
     lessonTypeDesc: LESSON_TYPES[ltk as keyof typeof LESSON_TYPES]?.desc || "",
     expectedErrors: errors,

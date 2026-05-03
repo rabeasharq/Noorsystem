@@ -90,6 +90,7 @@ export interface LessonPlan {
   alphaDesc: string;
   introLabel: string;
   introEx: string;
+  introDesc: string;
   lessonTypeLabel: string;
   lessonTypeDesc: string;
   expectedErrors: string[];

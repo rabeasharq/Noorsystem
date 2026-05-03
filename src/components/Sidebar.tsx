@@ -4,15 +4,17 @@
  */
 
 import { APP_NAME, APP_VERSION } from "../constants/data";
-import { LayoutDashboard, FilePlus, Folders, BarChart3, BookOpen, ShieldOff } from "lucide-react";
+import { LayoutDashboard, FilePlus, Folders, BarChart3, BookOpen, ShieldOff, Download } from "lucide-react";
 
 interface SidebarProps {
   view: string;
   setView: (v: string) => void;
   plansCount: number;
+  isInstallable?: boolean;
+  onInstall?: () => void;
 }
 
-export function Sidebar({ view, setView, plansCount }: SidebarProps) {
+export function Sidebar({ view, setView, plansCount, isInstallable, onInstall }: SidebarProps) {
   const nav = [
     { key: "form", icon: <FilePlus className="w-5 h-5"/>, label: "خطة جديدة" },
     { key: "history", icon: <Folders className="w-5 h-5"/>, label: "خططي", badge: plansCount },
@@ -59,6 +61,15 @@ export function Sidebar({ view, setView, plansCount }: SidebarProps) {
       </nav>
 
       <div className="p-6 border-t border-white/5 space-y-4">
+        {isInstallable && (
+          <button 
+            onClick={onInstall}
+            className="w-full flex items-center gap-3 p-3 bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 rounded-xl hover:bg-emerald-600 hover:text-white transition-all font-naskh text-sm font-bold"
+          >
+            <Download className="w-5 h-5" />
+            تثبيت المنظومة محلياً
+          </button>
+        )}
         <div className="text-[11px] text-slate-500 leading-relaxed font-naskh">
            اليمن · وزارة التربية والتعليم<br/>
            تم التطوير محلياً لدعم المعلم اليمني
