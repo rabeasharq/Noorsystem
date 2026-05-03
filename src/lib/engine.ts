@@ -9,27 +9,51 @@ import { OBJECTIVES, ERRORS, ASSESSMENTS, STRATEGIES, TOOLS, HOMEWORK } from "..
 import { formatDateArabic } from "./utils";
 
 /**
- * Stage builder constant
+ * Builds smart pedagogical stages based on subject and grade
  */
-function buildStages(subject: string, grade: string, duration: number): LessonPlanStage[] {
+function getSmartStages(subject: string, grade: string, duration: number, lessonType: string): LessonPlanStage[] {
   const G = parseInt(grade);
   const T = duration === 35
-    ? { intro: 7, present: 13, practice: 10, assess: 5 }
+    ? { intro: 6, present: 14, practice: 10, assess: 5 }
     : { intro: 5, present: 12, practice: 8, assess: 5 };
 
-  const genericClose = ["تلخيص القاعدة بمشاركة الطلاب", "سؤالان تقييميان سريعان", "تعزيز الطلاب المتميزين", "توجيه الواجب المنزلي"];
+  const close = ["استنتاج القاعدة النهائية", "سؤال 'تحدي ألفا' سريع", "توزيع نقاط التميز", "تحديد مهمة الواجب"];
 
-  const stagesMap: Record<string, LessonPlanStage[]> = {
-    grammar: [
-      { name: "التهيئة والمراجعة", t: T.intro, acts: G === 7 ? ["مراجعة سريعة بأسئلة شفهية", "تهيئة بمثال من البيئة اليمنية"] : ["مناقشة سريعة ومراجعة تطبيقية"], color: "#e8f4f8" },
-      { name: "العرض والشرح", t: T.present, acts: ["عرض الأمثلة", "استنباط القاعدة"], color: "#e8f8f0" },
-      { name: "التطبيق والممارسة", t: T.practice, acts: ["تطبيقات فردية", "لعبة لغوية"], color: "#fef9e7" },
-      { name: "التقييم والخلاصة", t: T.assess, acts: genericClose, color: "#fdf2f8" },
-    ]
-    // Add more mappings as needed or keep flexible
-  };
+  // Logic per subject
+  if (subject === 'grammar') {
+    return [
+      { name: "العصف الذهني والتمهيد", t: T.intro, acts: ["عرض جملة إشكالية من الواقع اليمني", "استثارة المعلومات اللاحقة", "تحديد هدف الرحلة النحوية"], color: "#e0f2fe" },
+      { name: "الاستنباط والنمذجة", t: T.present, acts: ["قراءة الأمثلة الشاهدة", "ملاحظة الظاهرة بالتلوين", "بناء القاعدة بمشاركة الطلاب", "توضيح المفاهيم الدقيقة"], color: "#f0fdf4" },
+      { name: "محطات التطبيق (جيل ألفا)", t: T.practice, acts: ["نشاط 'المكتشف الصغير'", "تدريبات متدرجة (سهل/صعب)", "تصحيح تبادلي فوري"], color: "#fefce8" },
+      { name: "الخاتمة والتقييم", t: T.assess, acts: close, color: "#fdf2f8" },
+    ];
+  }
 
-  return stagesMap[subject] || stagesMap.grammar;
+  if (subject === 'texts' || subject === 'reading') {
+    return [
+      { name: "التهيئة النفسية والقرائية", t: T.intro, acts: ["عرض صورة أو مشهد محفز", "توقع أحداث النص", "كسر الجمود الأدبي"], color: "#e0f2fe" },
+      { name: "القراءة التحليلية", t: T.present, acts: ["قراءة جهرية نموذجية", "تفكيك الوحدات المعنوية", "تحليل الجماليات والصور", "شرح المفردات بالسياق"], color: "#f0fdf4" },
+      { name: "التفاعل النقدي والإبداعي", t: T.practice, acts: ["استخراج القيم المستفادة", "ربط النص بالواقع اليمني", "نشاط 'لو كنت مكان الكاتب'"], color: "#fefce8" },
+      { name: "إغلاق الحصة", t: T.assess, acts: close, color: "#fdf2f8" },
+    ];
+  }
+
+  if (subject === 'dictation' || subject === 'calligraphy') {
+    return [
+      { name: "الملاحظة البصرية", t: T.intro, acts: ["تأمل الحروف/الكلمات المستهدفة", "تحليل الشكل والمبنى"], color: "#e0f2fe" },
+      { name: "المحاكاة والنمذجة", t: T.present, acts: ["كتابة النموذج على السبورة", "شرح قواعد الرسم الصحيح"], color: "#f0fdf4" },
+      { name: "التدريب العملي متناهي الصغر", t: T.practice, acts: ["تطبيق 'الخمس دقائق' المركزة", "تحسين النموذج تدريجياً"], color: "#fefce8" },
+      { name: "التقييم الجمالي", t: T.assess, acts: close, color: "#fdf2f8" },
+    ];
+  }
+
+  // Default fallback
+  return [
+    { name: "التمهيد", t: T.intro, acts: ["تهيئة مشوقة للطلاب"], color: "#e0f2fe" },
+    { name: "العرض", t: T.present, acts: ["شرح المحتوى الأساسي"], color: "#f0fdf4" },
+    { name: "التطبيق", t: T.practice, acts: ["تمارين تطبيقية"], color: "#fefce8" },
+    { name: "الخاتمة", t: T.assess, acts: ["تقليل وتلخيص"], color: "#fdf2f8" },
+  ];
 }
 
 /**
@@ -46,8 +70,8 @@ export function buildPlan(form: LessonPlanForm): LessonPlan {
   const objectives = (OBJECTIVES[form.subject]?.[gn] || [])
     .map(o => `${o} ${form.lessonTitle}`);
 
-  const errors = ERRORS[form.subject]?.[gn] || [];
-  const remedies = errors.map(() => "تصحيح فوري بأسلوب التساؤل ثم مثال تصحيحي مقابل");
+  const errors = ERRORS[form.subject]?.[gn] || ["خطأ في الفهم العام"];
+  const remedies = errors.map(() => "تصحيح فوري بأسلوب المقارنة والمقابلة والتعزيز البصري");
   
   const challengeRecs = (form.classProblems || [])
     .flatMap(k => CHALLENGES[k]?.recs || []);
@@ -56,10 +80,10 @@ export function buildPlan(form: LessonPlanForm): LessonPlan {
     id: Date.now(),
     form,
     meta: {
-      grade: g.label,
+      grade: g?.label || "غير محدد",
       gradeNum: gn,
-      gradeCode: g.code,
-      subject: sub.label,
+      gradeCode: g?.code || "GX",
+      subject: sub?.label || "عربي",
       subjectKey: form.subject,
       subType: form.subType || "",
       lessonTitle: form.lessonTitle,
@@ -74,20 +98,20 @@ export function buildPlan(form: LessonPlanForm): LessonPlan {
       rawDate: form.date,
       duration: form.duration,
       week: form.week || "1",
-      level: g.level,
-      bloom: g.bloom,
-      cogNote: g.cog,
+      level: g?.level || "",
+      bloom: g?.bloom || "",
+      cogNote: g?.cog || "",
       lessonTypeLabel: LESSON_TYPES[ltk as keyof typeof LESSON_TYPES]?.label || "",
       introTypeLabel: INTRO_TYPES[itk as keyof typeof INTRO_TYPES]?.label || "",
       alphaLabel: ALPHA_STRATEGIES[ask as keyof typeof ALPHA_STRATEGIES]?.label || "",
-      color: g.color,
-      accent: g.accent,
-      light: g.light,
+      color: g?.color || "#1b3f7a",
+      accent: g?.accent || "#3d8ef0",
+      light: g?.light || "#e8f2ff",
     },
     objectives,
     strategies: STRATEGIES[form.subject]?.[gn] || [],
     tools: TOOLS[form.subject]?.[gn] || [],
-    stages: buildStages(form.subject, form.grade, parseInt(form.duration)),
+    stages: getSmartStages(form.subject, form.grade, parseInt(form.duration), ltk),
     alphaStrategy: ALPHA_STRATEGIES[ask as keyof typeof ALPHA_STRATEGIES]?.label || "",
     alphaDesc: ALPHA_STRATEGIES[ask as keyof typeof ALPHA_STRATEGIES]?.desc || "",
     introLabel: INTRO_TYPES[itk as keyof typeof INTRO_TYPES]?.label || "",
@@ -100,9 +124,9 @@ export function buildPlan(form: LessonPlanForm): LessonPlan {
     homework: HOMEWORK[form.subject]?.[gn] || "",
     challengeRecs,
     references: [
-      `الكتاب المدرسي للغة العربية — ${g.label}`,
-      "دليل المعلم — وزارة التربية والتعليم اليمنية",
-      "معجم الوسيط",
+      `الكتاب المدرسي للغة العربية — ${g?.label || ""}`,
+      "دليل المعلم التربوي اليمني",
+      "معجم الوسيط والموارد الرقمية للمنظومة",
     ],
   };
 }
