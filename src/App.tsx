@@ -13,7 +13,9 @@ import { FeedbackPanel } from "./components/FeedbackPanel";
 import { GuidePanel } from "./components/GuidePanel";
 import { StudentManager } from "./components/StudentManager";
 import { ClassroomManager } from "./components/ClassroomManager";
+import { LibraryPanel } from "./components/LibraryPanel";
 import { useNoor } from "./hooks/useNoor";
+import { NoorDB } from "./lib/db";
 import { AnimatePresence, motion } from "motion/react";
 import { buildPlan } from "./lib/engine";
 import { LessonPlan, LessonPlanForm } from "./types";
@@ -180,6 +182,13 @@ export default function App() {
                 />
               )}
               {view === "feedback" && <FeedbackPanel plans={plans} students={students} activities={activities} />}
+              {view === "curriculum" && (
+                <LibraryPanel 
+                   curriculum={curriculum} 
+                   onSave={(c) => NoorDB.saveCurriculumBatch(c).then(refresh)} 
+                   onDelete={(id) => NoorDB.deleteCurriculumItem(id).then(refresh)}
+                />
+              )}
               {view === "backup" && <BackupPanel onImported={refresh} toast={showToast} />}
               {view === "guide" && <GuidePanel />}
             </motion.div>

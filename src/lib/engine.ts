@@ -35,6 +35,26 @@ function getSmartStages(form: LessonPlanForm): LessonPlanStage[] {
     ];
   }
 
+  // If "Blitz" (رعد التعلم السريع)
+  if (alphaKey === 'micro') {
+    return [
+      { name: "شرارة الانطلاق", t: T.intro, acts: ["تحدي بصري سريع (30 ثانية)", "تحديد المهارة الجوهرية فقط"], color: "#e0f2fe" },
+      { name: "رعد المعلومات (The Blitz)", t: T.present, acts: ["شرح مكثف عالي الوتيرة", "استخدام خرائط ذهنية خاطفة", "تقنية 'اللقطة الواحدة' للمفهوم"], color: "#f0fdf4" },
+      { name: "التطبيق الانفجاري", t: T.practice, acts: ["حل 3 مهام في 3 دقائق", "تحويل المعرفة لفعل فوري", "نشاط حركي قصير لكسر الرتابة"], color: "#fefce8" },
+      { name: "تثبيت الأثر", t: T.assess, acts: ["استرجاع سريع لأهم جملة", ...close], color: "#fdf2f8" },
+    ];
+  }
+
+  // If "Digital Story" (السرد القصصي الإبداعي)
+  if (alphaKey === 'digital_story') {
+    return [
+      { name: "بداية الحكاية", t: T.intro, acts: ["رسم معالم القصة مع الطلاب", "اختيار أبطال الدرس اللغوي"], color: "#e0f2fe" },
+      { name: "بناء الحبكة المعرفية", t: T.present, acts: ["تفاعل الأبطال (القواعد/النصوص)", "اكتشاف الصراع اللغوي (الأخطاء الشائعة)", "بناء هيكل القصة الجماعي"], color: "#f0fdf4" },
+      { name: "النهاية السعيدة (تطبيق)", t: T.practice, acts: ["كتابة خاتمة القصة باستخدام الدرس", "حل المشكلة اللغوية المحورية", "تقييم جودة السرد المعرفي"], color: "#fefce8" },
+      { name: "توقيع الكتاب والرؤية", t: T.assess, acts: ["استخلاص الحكمة اللغوية", ...close], color: "#fdf2f8" },
+    ];
+  }
+
   // Logic per subject
   if (subject === 'grammar') {
     return [

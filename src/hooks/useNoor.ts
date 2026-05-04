@@ -97,12 +97,18 @@ export function useNoor() {
     if (entries.length === 0) return null;
 
     const lowest = entries.sort((a,b) => a[1] - b[1])[0];
+    const topPerformer = students.filter(s => s.grade === grade).sort((a,b) => b.points - a.points)[0];
     
     return {
       weakPoints: [lowest[0]],
       recommendation: lowest[0] === 'reading' 
         ? "لاحظت المنظومة ضعفاً في القراءة لدى هذا الصف، يُقترح بدء الدرس القادم بنشاط 'القراءة المعبرة' وتركيز النقاط عليها."
-        : "يُقترح تعزيز مهارة متميزة في " + lowest[0] + " في الحصة القادمة لتطوير الطلاب المتعثرين."
+        : "يُقترح تعزيز مهارة متميزة في " + lowest[0] + " في الحصة القادمة لتطوير الطلاب المتعثرين.",
+      prediction: {
+        focus: lowest[0],
+        expectedEngagement: "عالي",
+        mentorStudent: topPerformer?.name
+      }
     };
   };
 

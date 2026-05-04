@@ -239,5 +239,16 @@ export const NoorDB = {
       transaction.oncomplete = () => resolve();
       transaction.onerror = () => reject(transaction.error);
     });
+  },
+
+  async deleteCurriculumItem(id: string): Promise<void> {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_CURRICULUM, "readwrite");
+      const store = transaction.objectStore(STORE_CURRICULUM);
+      const request = store.delete(id);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
   }
 };

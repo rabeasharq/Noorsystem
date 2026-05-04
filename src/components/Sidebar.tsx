@@ -19,6 +19,7 @@ export function Sidebar({ view, setView, plansCount, isInstallable, onInstall }:
     { key: "form", icon: <FilePlus className="w-5 h-5"/>, label: "خطة جديدة" },
     { key: "history", icon: <Folders className="w-5 h-5"/>, label: "خططي", badge: plansCount },
     { key: "students", icon: <Users className="w-5 h-5"/>, label: "طلاب جيل ألفا" },
+    { key: "curriculum", icon: <BookOpen className="w-5 h-5"/>, label: "المناهج والكتب" },
     { key: "feedback", icon: <BarChart3 className="w-5 h-5"/>, label: "التغذية الراجعة" },
     { key: "backup", icon: <ShieldOff className="w-5 h-5"/>, label: "الأمان والنسخ" },
     { key: "guide", icon: <BookOpen className="w-5 h-5"/>, label: "الدليل" },
