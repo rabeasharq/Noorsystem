@@ -3,16 +3,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { GRADES, SUBJECTS, DAYS, PERIODS, LESSON_TYPES, INTRO_TYPES, ALPHA_STRATEGIES, CHALLENGES, REVIEW_WEEKS } from "../constants/data";
+import { YEMEN_CURRICULUM } from "../constants/curriculumData";
 import { ERRORS } from "../constants/content";
-import { LessonPlanForm } from "../types";
-import { LayoutDashboard, BookOpen, GraduationCap, Users } from "lucide-react";
+import { LessonPlanForm, CurriculumItem } from "../types";
+import { LayoutDashboard, BookOpen, GraduationCap, Users, Sparkles, Book } from "lucide-react";
+import { CurriculumSelector } from "./CurriculumSelector";
 import { cn } from "../lib/utils";
 
 interface FormPanelProps {
   onGenerate: (form: LessonPlanForm) => void;
   initialProfile?: any;
+  curriculum: CurriculumItem[];
+  getInsight: (grade: string) => any;
+  initCurriculum: (data: any[]) => void;
 }
 
 const EMPTY_FORM: LessonPlanForm = {
@@ -35,12 +40,31 @@ const EMPTY_FORM: LessonPlanForm = {
   classProblems: [],
 };
 
-export function FormPanel({ onGenerate, initialProfile }: FormPanelProps) {
+export function FormPanel({ onGenerate, initialProfile, curriculum, getInsight, initCurriculum }: FormPanelProps) {
+  useEffect(() => {
+    if (curriculum.length === 0) {
+      initCurriculum(YEMEN_CURRICULUM);
+    }
+  }, [curriculum.length, initCurriculum]);
+
   const [form, setForm] = useState<LessonPlanForm>(() => ({
     ...EMPTY_FORM,
     ...initialProfile,
   }));
   const [tab, setTab] = useState<"info" | "pedagogy" | "classroom">("info");
+  const [showCurriculum, setShowCurriculum] = useState(true);
+
+  const handleSelectFromBook = (item: CurriculumItem) => {
+    setForm(prev => ({
+      ...prev,
+      subject: item.subject,
+      lessonTitle: item.title,
+      bookUnit: item.unit,
+      curriculumId: item.id,
+      bookObjectives: item.objectives
+    }));
+    setShowCurriculum(false);
+  };
 
   const update = (key: keyof LessonPlanForm, value: any) => {
     setForm((f) => ({ ...f, [key]: value }));
@@ -104,7 +128,20 @@ export function FormPanel({ onGenerate, initialProfile }: FormPanelProps) {
       <div className="space-y-8">
         {tab === "info" && (
           <div className="space-y-6">
-            <Section title="هوية المعلم والمدرسة" icon="🏫">
+            {showCurriculum && form.grade && (
+              <CurriculumSelector 
+                 grade={form.grade} 
+                 items={curriculum} 
+                 onSelect={handleSelectFromBook} 
+                 insight={getInsight(form.grade)}
+              />
+            )}
+
+            <Section 
+              title="هوية المعلم والمدرسة" 
+              icon="🏫"
+              className={cn(!showCurriculum && "opacity-60 grayscale-[0.5] transition-all hover:opacity-100 hover:grayscale-0")}
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Field label="اسم المعلم" value={form.teacherName} onChange={v => update("teacherName", v)} placeholder="الاسم الكامل" />
                 <Field label="اسم المدرسة" value={form.schoolName} onChange={v => update("schoolName", v)} placeholder="اسم المدرسة" />
@@ -112,7 +149,19 @@ export function FormPanel({ onGenerate, initialProfile }: FormPanelProps) {
               </div>
             </Section>
 
-            <Section title="بيانات الدرس الأساسية" icon="📖">
+            <Section 
+              title={showCurriculum ? "تعبئة يدوية للبيانات" : "بيانات الدرس المستوردة"} 
+              icon="📖"
+              className={cn(!showCurriculum && "border-sky-500/50 bg-sky-500/5 shadow-2xl shadow-sky-500/10")}
+            >
+              {!showCurriculum && (
+                <button 
+                  onClick={() => setShowCurriculum(true)}
+                  className="mb-4 text-[10px] text-sky-400 font-bold flex items-center gap-1 hover:underline underline-offset-4"
+                >
+                  <Sparkles className="w-3 h-3"/> العودة لاقتراحات الكتاب المدرسي الذكية
+                </button>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Select label="الصف الدراسي" value={form.grade} onChange={v => update("grade", v)}>
                   <option value="">— اختر الصف —</option>
@@ -147,8 +196,9 @@ export function FormPanel({ onGenerate, initialProfile }: FormPanelProps) {
                 </Select>
                 <Field label="التاريخ" type="date" value={form.date} onChange={v => update("date", v)} />
                 <Select label="المدة" value={form.duration} onChange={v => update("duration", v)}>
-                  <option value="35">35 دقيقة</option>
-                  <option value="30">30 دقيقة</option>
+                  <option value="35">35 دقيقة (شتوي)</option>
+                  <option value="40">40 دقيقة (صيفي)</option>
+                  <option value="30">30 دقيقة (مكثف)</option>
                 </Select>
                 <Select label="الأسبوع" value={form.week} onChange={v => update("week", v)}>
                   {Array.from({ length: 14 }, (_, i) => i + 1).map(w => <option key={w} value={w}>الأسبوع {w}</option>)}

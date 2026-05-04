@@ -11,6 +11,8 @@ import { PreviewPanel } from "./components/PreviewPanel";
 import { HistoryPanel } from "./components/HistoryPanel";
 import { FeedbackPanel } from "./components/FeedbackPanel";
 import { GuidePanel } from "./components/GuidePanel";
+import { StudentManager } from "./components/StudentManager";
+import { ClassroomManager } from "./components/ClassroomManager";
 import { useNoor } from "./hooks/useNoor";
 import { AnimatePresence, motion } from "motion/react";
 import { buildPlan } from "./lib/engine";
@@ -20,8 +22,13 @@ export default function App() {
   const [view, setView] = useState("form");
   const [activePlan, setActivePlan] = useState<LessonPlan | null>(null);
   const [isSaved, setIsSaved] = useState(false);
+  const [isClassroomMode, setIsClassroomMode] = useState(false);
   const [toast, setToast] = useState<{msg:string, type:'success'|'error'|'info'} | null>(null);
-  const { plans, profile, isLoading, savePlan, deletePlan, refresh, updateProfile } = useNoor();
+  const { 
+    plans, profile, students, activities, curriculum, isLoading, 
+    savePlan, deletePlan, saveStudent, deleteStudent, logActivity, 
+    getInsight, initCurriculum, refresh, updateProfile 
+  } = useNoor();
 
   const showToast = (msg: string, type: 'success'|'error'|'info' = 'info') => {
     setToast({ msg, type });
@@ -110,6 +117,7 @@ export default function App() {
            <h2 className="text-xl font-bold text-white font-naskh">
              {view === "form" && "إنشاء تحضير جديد"}
              {view === "history" && "سجل الخطط المحفوظة"}
+             {view === "students" && "إدارة الطلاب والتحفيز الذكي"}
              {view === "feedback" && "التغذية الراجعة التطورية"}
              {view === "backup" && "إدارة البيانات والأمان"}
              {view === "guide" && "دليل الاستخدام"}
@@ -139,12 +147,21 @@ export default function App() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              {view === "form" && <FormPanel onGenerate={handleGenerate} initialProfile={profile} />}
+              {view === "form" && (
+                <FormPanel 
+                  onGenerate={handleGenerate} 
+                  initialProfile={profile} 
+                  curriculum={curriculum}
+                  getInsight={getInsight}
+                  initCurriculum={initCurriculum}
+                />
+              )}
               {view === "preview" && activePlan && (
                 <PreviewPanel 
                   plan={activePlan} 
                   onBack={() => setView("form")} 
                   onSave={handleSaveActive}
+                  onStartClass={() => setIsClassroomMode(true)}
                   saved={isSaved}
                 />
               )}
@@ -155,7 +172,14 @@ export default function App() {
                   onDelete={handleDeleteHistory} 
                 />
               )}
-              {view === "feedback" && <FeedbackPanel plans={plans} />}
+              {view === "students" && (
+                <StudentManager 
+                  students={students} 
+                  onSave={saveStudent} 
+                  onDelete={deleteStudent} 
+                />
+              )}
+              {view === "feedback" && <FeedbackPanel plans={plans} students={students} activities={activities} />}
               {view === "backup" && <BackupPanel onImported={refresh} toast={showToast} />}
               {view === "guide" && <GuidePanel />}
             </motion.div>
@@ -181,6 +205,16 @@ export default function App() {
       </main>
 
       <style>{`.custom-scrollbar::-webkit-scrollbar { width: 4px; }`}</style>
+      
+      {isClassroomMode && activePlan && (
+        <ClassroomManager 
+          plan={activePlan} 
+          students={students} 
+          onLogActivity={logActivity}
+          onUpdateStudent={saveStudent}
+          onClose={() => setIsClassroomMode(false)}
+        />
+      )}
     </div>
   );
 }

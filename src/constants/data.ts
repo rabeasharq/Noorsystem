@@ -92,3 +92,12 @@ export const CHALLENGES: Record<string, { label: string, icon: string, recs: str
   mixed_levels: { label:"تفاوت المستويات",     icon:"📊",
     recs:["مهام متمايزة (سهل/متوسط/متقدم)","المتقدم يساعد المبتدئ","أنشطة متدرجة تُشبع كل مستوى","تقييم بنكي متعدد المستويات"] },
 };
+
+export const BADGES = [
+  { id: "reader_gold", label: "القارئ الذهبي", icon: "📖", color: "#fbbf24", requirement: "إتقان القراءة والضبط" },
+  { id: "calligrapher", label: "الخطاط المبدع", icon: "✒️", color: "#10b981", requirement: "جمال الخط والترتيب" },
+  { id: "grammar_king", label: "فارس اللغة", icon: "⚖️", color: "#3b82f6", requirement: "التفوق في قواعد النحو" },
+  { id: "perfect_notebook", label: "الدفتر المثالي", icon: "📓", color: "#f59e0b", requirement: "تنظيم الدفتر والواجب" },
+  { id: "scholar", label: "المثابر الذكي", icon: "🎓", color: "#a855f7", requirement: "المشاركة الفعالة بالفصل" },
+  { id: "behavior_star", label: "نجم الأخلاق", icon: "🌟", color: "#f43f5e", requirement: "السلوك القويم مع الزملاء" },
+];

@@ -17,9 +17,11 @@ function getSmartStages(form: LessonPlanForm): LessonPlanStage[] {
   const subject = form.subject;
   const alphaKey = form.alphaStrategy;
 
-  const T = duration === 35
-    ? { intro: 6, present: 14, practice: 10, assess: 5 }
-    : { intro: 5, present: 12, practice: 8, assess: 5 };
+  const T = duration === 40 
+    ? { intro: 7, present: 16, practice: 11, assess: 6 }
+    : duration === 35
+      ? { intro: 6, present: 14, practice: 10, assess: 5 }
+      : { intro: 5, present: 12, practice: 8, assess: 5 };
 
   const close = ["استنتاج القاعدة النهائية", "سؤال 'تحدي ألفا' سريع", "توزيع نقاط التميز", "تحديد مهمة الواجب"];
 
@@ -81,8 +83,9 @@ export function buildPlan(form: LessonPlanForm): LessonPlan {
   const ltk = form.lessonType || "inductive";
   const ask = form.alphaStrategy || "stations";
 
-  const objectives = (OBJECTIVES[form.subject]?.[gn] || [])
-    .map(o => `${o} ${form.lessonTitle}`);
+  const objectives = form.bookObjectives && form.bookObjectives.length > 0
+    ? form.bookObjectives
+    : (OBJECTIVES[form.subject]?.[gn] || []).map(o => `${o} ${form.lessonTitle}`);
 
   const errors = ERRORS[form.subject]?.[gn] || ["خطأ في الفهم العام"];
   const remedies = errors.map(() => "تصحيح فوري بأسلوب المقارنة والمقابلة والتعزيز البصري");

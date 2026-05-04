@@ -23,6 +23,54 @@ export interface Subject {
   color: string;
 }
 
+export interface Student {
+  id: string;
+  name: string;
+  grade: string;
+  classId: string; // e.g. "أ", "ب"
+  points: number;
+  badges: string[];
+  lastActivityAt?: string;
+}
+
+export interface ActivityLog {
+  id: string;
+  studentId: string;
+  type: 'positive' | 'negative';
+  category: 'reading' | 'calligraphy' | 'homework' | 'behavior' | 'participation' | 'memorization' | 'notebook';
+  points: number;
+  note: string;
+  timestamp: string;
+  lessonId?: number;
+}
+
+export interface Badge {
+  id: string;
+  label: string;
+  icon: string;
+  requirement: string;
+  color: string;
+}
+
+export interface CurriculumItem {
+  id: string;
+  grade: string;
+  subject: string;
+  unit: string;
+  title: string;
+  objectives: string[];
+  keyConcepts: string[];
+  suggestedIntro: string;
+}
+
+export interface TeacherInsight {
+  date: string;
+  summary: string;
+  weakPoints: string[];
+  strongPoints: string[];
+  recommendationForNext: string;
+}
+
 export interface LessonPlanForm {
   teacherName: string;
   schoolName: string;
@@ -35,12 +83,14 @@ export interface LessonPlanForm {
   day: string;
   period: string;
   date: string;
-  duration: string;
+  duration: string; // "35" | "40"
   week: string;
   lessonType: string;
   introType: string;
   alphaStrategy: string;
   classProblems: string[];
+  curriculumId?: string;
+  bookObjectives?: string[];
 }
 
 export interface LessonPlanStage {

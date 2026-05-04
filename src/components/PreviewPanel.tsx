@@ -5,17 +5,18 @@
 
 import React, { useRef } from "react";
 import { LessonPlan } from "../types";
-import { Printer, Download, ChevronRight, Share2, Sparkles, BookOpen, Clock, Target, Ghost } from "lucide-react";
+import { Printer, Download, ChevronRight, Share2, Sparkles, BookOpen, Clock, Target, Ghost, Play } from "lucide-react";
 import { cn } from "../lib/utils";
 
 interface PreviewPanelProps {
   plan: LessonPlan;
   onBack: () => void;
   onSave: () => void;
+  onStartClass: () => void;
   saved: boolean;
 }
 
-export function PreviewPanel({ plan, onBack, onSave, saved }: PreviewPanelProps) {
+export function PreviewPanel({ plan, onBack, onSave, onStartClass, saved }: PreviewPanelProps) {
   const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = () => {
@@ -46,6 +47,13 @@ export function PreviewPanel({ plan, onBack, onSave, saved }: PreviewPanelProps)
             )}
           >
             {saved ? "تم الحفظ محلياً" : "حفظ الخطة"}
+          </button>
+          <button 
+            onClick={onStartClass}
+            className="flex items-center gap-2 px-5 py-2.5 bg-gold text-slate-950 rounded-xl font-bold hover:scale-105 transition-all font-naskh animate-pulse"
+          >
+            <Play className="w-5 h-5 fill-current" />
+            بدء الحصة النشطة
           </button>
           <button 
             onClick={handlePrint}

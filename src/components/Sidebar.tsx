@@ -4,7 +4,7 @@
  */
 
 import { APP_NAME, APP_VERSION } from "../constants/data";
-import { LayoutDashboard, FilePlus, Folders, BarChart3, BookOpen, ShieldOff, Download } from "lucide-react";
+import { LayoutDashboard, FilePlus, Folders, BarChart3, BookOpen, ShieldOff, Download, Users } from "lucide-react";
 
 interface SidebarProps {
   view: string;
@@ -18,6 +18,7 @@ export function Sidebar({ view, setView, plansCount, isInstallable, onInstall }:
   const nav = [
     { key: "form", icon: <FilePlus className="w-5 h-5"/>, label: "خطة جديدة" },
     { key: "history", icon: <Folders className="w-5 h-5"/>, label: "خططي", badge: plansCount },
+    { key: "students", icon: <Users className="w-5 h-5"/>, label: "طلاب جيل ألفا" },
     { key: "feedback", icon: <BarChart3 className="w-5 h-5"/>, label: "التغذية الراجعة" },
     { key: "backup", icon: <ShieldOff className="w-5 h-5"/>, label: "الأمان والنسخ" },
     { key: "guide", icon: <BookOpen className="w-5 h-5"/>, label: "الدليل" },
