@@ -13,24 +13,48 @@ import { FeedbackPanel } from "./components/FeedbackPanel";
 import { GuidePanel } from "./components/GuidePanel";
 import { StudentManager } from "./components/StudentManager";
 import { ClassroomManager } from "./components/ClassroomManager";
+import { DashboardPanel } from "./components/DashboardPanel";
 import { LibraryPanel } from "./components/LibraryPanel";
+import { AuthView } from "./components/AuthView";
+import { StudentPortal } from "./components/StudentPortal";
 import { useNoor } from "./hooks/useNoor";
 import { NoorDB } from "./lib/db";
 import { AnimatePresence, motion } from "motion/react";
 import { buildPlan } from "./lib/engine";
-import { LessonPlan, LessonPlanForm } from "./types";
+import { LessonPlan, LessonPlanForm, CurriculumItem } from "./types";
 
 export default function App() {
-  const [view, setView] = useState("form");
+  const [userRole, setUserRole] = useState<"teacher" | "student" | null>(null);
+  const [currentStudentId, setCurrentStudentId] = useState<string | null>(null);
+  const [view, setView] = useState("dashboard");
   const [activePlan, setActivePlan] = useState<LessonPlan | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [isClassroomMode, setIsClassroomMode] = useState(false);
   const [toast, setToast] = useState<{msg:string, type:'success'|'error'|'info'} | null>(null);
+  const [preSelectedLesson, setPreSelectedLesson] = useState<CurriculumItem | null>(null);
   const { 
     plans, profile, students, activities, curriculum, isLoading, 
     savePlan, deletePlan, saveStudent, deleteStudent, logActivity, 
     getInsight, initCurriculum, refresh, updateProfile 
   } = useNoor();
+
+  const handleLogin = (role: "teacher" | "student", studentId?: string) => {
+    setUserRole(role);
+    if (role === "student" && studentId) {
+      setCurrentStudentId(studentId);
+    }
+  };
+
+  const handleLogout = () => {
+    setUserRole(null);
+    setCurrentStudentId(null);
+    setView("dashboard");
+  };
+
+  const handleSelectLessonFromDash = (item: CurriculumItem) => {
+    setPreSelectedLesson(item);
+    setView("form");
+  };
 
   const showToast = (msg: string, type: 'success'|'error'|'info' = 'info') => {
     setToast({ msg, type });
@@ -103,6 +127,25 @@ export default function App() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="h-screen bg-slate-950 flex flex-col items-center justify-center space-y-4">
+        <div className="w-16 h-16 border-4 border-gold/20 border-t-gold rounded-full animate-spin"></div>
+        <p className="text-gold font-naskh animate-pulse">جاري تحميل منظومة نور...</p>
+      </div>
+    );
+  }
+
+  if (!userRole) {
+    return <AuthView students={students} onLogin={handleLogin} />;
+  }
+
+  if (userRole === "student" && currentStudentId) {
+    const student = students.find(s => s.id === currentStudentId);
+    if (!student) return null;
+    return <StudentPortal student={student} activities={activities} onLogout={handleLogout} />;
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-[#080c1a] font-amiri select-none">
       <Sidebar 
@@ -126,6 +169,15 @@ export default function App() {
              {view === "preview" && "معاينة الخطة"}
            </h2>
            <div className="flex items-center gap-4">
+             <button 
+               onClick={handleLogout}
+               className="p-2 text-slate-500 hover:text-white transition-colors"
+               title="خروج"
+             >
+               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                 🔒
+               </motion.div>
+             </button>
              {profile?.teacherName && (
                <div className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">
                  مرحباً أ. {profile.teacherName}
@@ -149,6 +201,16 @@ export default function App() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
+              {view === "dashboard" && (
+                <DashboardPanel 
+                   students={students} 
+                   curriculum={curriculum} 
+                   plans={plans} 
+                   insight={getInsight("7")} // Defaulting insight for now, can be sophisticated
+                   onNavigate={setView}
+                   onSelectLesson={handleSelectLessonFromDash}
+                />
+              )}
               {view === "form" && (
                 <FormPanel 
                   onGenerate={handleGenerate} 
@@ -156,6 +218,8 @@ export default function App() {
                   curriculum={curriculum}
                   getInsight={getInsight}
                   initCurriculum={initCurriculum}
+                  preSelectedLesson={preSelectedLesson}
+                  onClearPreSelected={() => setPreSelectedLesson(null)}
                 />
               )}
               {view === "preview" && activePlan && (

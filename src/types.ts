@@ -31,6 +31,7 @@ export interface Student {
   points: number;
   badges: string[];
   lastActivityAt?: string;
+  loginCode?: string; // Format: S-XXXX
 }
 
 export interface ActivityLog {

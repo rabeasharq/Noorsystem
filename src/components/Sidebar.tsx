@@ -16,6 +16,7 @@ interface SidebarProps {
 
 export function Sidebar({ view, setView, plansCount, isInstallable, onInstall }: SidebarProps) {
   const nav = [
+    { key: "dashboard", icon: <LayoutDashboard className="w-5 h-5"/>, label: "الرئيسية" },
     { key: "form", icon: <FilePlus className="w-5 h-5"/>, label: "خطة جديدة" },
     { key: "history", icon: <Folders className="w-5 h-5"/>, label: "خططي", badge: plansCount },
     { key: "students", icon: <Users className="w-5 h-5"/>, label: "طلاب جيل ألفا" },

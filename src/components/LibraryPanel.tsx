@@ -5,7 +5,7 @@
 
 import React, { useState } from "react";
 import { CurriculumItem } from "../types";
-import { Book, Upload, Search, Trash2, Library, Loader2, Sparkles, AlertCircle } from "lucide-react";
+import { Book, Upload, Search, Trash2, Library, Loader2, Sparkles, AlertCircle, Target } from "lucide-react";
 import { cn } from "../lib/utils";
 import * as pdfjs from 'pdfjs-dist';
 import { GoogleGenAI, Type } from "@google/genai";
@@ -129,105 +129,127 @@ export function LibraryPanel({ curriculum, onSave, onDelete }: LibraryPanelProps
   );
 
   return (
-    <div className="space-y-8 pb-20">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-          <h2 className="text-3xl font-bold text-white flex items-center gap-3 font-naskh">
-            <Library className="w-8 h-8 text-gold" />
-            المكتبة المنهجية الذكية
-          </h2>
-          <p className="text-slate-500 text-sm mt-1">قم برفع كتاب المادة (PDF) لتحليله وفهرسته تلقائياً</p>
-        </div>
+    <div className="space-y-8 pb-32 max-w-6xl mx-auto">
+      <div className="relative p-10 glass-panel overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 noor-glow opacity-10"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 noor-glow opacity-10 bg-sky-500/30"></div>
+        
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="text-center md:text-right">
+            <h2 className="text-4xl font-bold text-white flex items-center justify-center md:justify-start gap-4 font-naskh">
+              <Library className="w-10 h-10 text-gold" />
+              المكتبة المنهجية الذكية
+            </h2>
+            <p className="text-slate-400 text-base mt-2 max-w-md font-naskh">
+              حوّل كتب اللغة العربية الرقمية (PDF) إلى قاعدة بيانات تفاعلية تدعم تخطيطك اليومي بذكاء.
+            </p>
+          </div>
 
-        <label className={cn(
-          "relative flex items-center gap-3 px-6 py-3 bg-gold text-[#1a0a2a] rounded-2xl font-bold font-naskh cursor-pointer hover:scale-105 transition-all shadow-xl shadow-gold/20",
-          isProcessing && "opacity-50 cursor-wait pointer-events-none"
-        )}>
-           {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
-           {isProcessing ? "جاري التحليل والاستيعاب..." : "تحميل وفهرسة كتاب جديد"}
-           <input type="file" accept="application/pdf" className="hidden" onChange={handleFileUpload} />
-        </label>
+          <div className="flex flex-col items-center gap-4">
+            <label className={cn(
+              "relative flex items-center gap-4 px-8 py-4 bg-gold text-slate-950 rounded-2xl font-bold font-naskh cursor-pointer hover:scale-105 transition-all shadow-2xl shadow-gold/20 active:scale-95 group",
+              isProcessing && "opacity-50 cursor-wait pointer-events-none"
+            )}>
+               {isProcessing ? <Loader2 className="w-6 h-6 animate-spin" /> : <Upload className="w-6 h-6 group-hover:-translate-y-1 transition-transform" />}
+               <span className="text-lg">{isProcessing ? "جاري الاستيعاب رقمياً..." : "فهرسة كتاب مدرسي"}</span>
+               <input type="file" accept="application/pdf" className="hidden" onChange={handleFileUpload} />
+            </label>
+            {isProcessing && (
+              <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+                <div className="bg-gold h-full animate-[progress_2s_infinite_linear]" style={{ width: '40%' }}></div>
+              </div>
+            )}
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">يدعم كتب المناهج اليمنية والعربية</p>
+          </div>
+        </div>
       </div>
 
       {error && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl flex items-center gap-3 text-rose-400 text-sm animate-in fade-in slide-in-from-top-2">
-           <AlertCircle className="w-5 h-5" />
-           {error}
+        <div className="p-6 bg-rose-500/10 border border-rose-500/30 rounded-3xl flex items-center gap-4 text-rose-400 font-naskh animate-in fade-in slide-in-from-top-4">
+           <AlertCircle className="w-6 h-6 shrink-0" />
+           <p className="text-sm">{error}</p>
         </div>
       )}
 
-      {/* Stats and Search */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-         <div className="md:col-span-3 relative">
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+      {/* Search and Stats */}
+      <div className="flex flex-col md:flex-row gap-6">
+         <div className="flex-1 relative">
+            <Search className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
             <input 
               type="text"
-              placeholder="ابحث في الدروس المفوهرسة..."
+              placeholder="البحث في فهرس الدروس..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pr-12 pl-6 text-white focus:border-gold outline-none transition-all font-naskh"
+              className="w-full glass-panel !rounded-2xl py-5 pr-14 pl-6 text-white focus:border-gold outline-none transition-all font-naskh placeholder:text-slate-600"
             />
          </div>
-         <div className="bg-slate-900 border border-white/5 p-4 rounded-2xl flex flex-col justify-center items-center">
-            <div className="text-2xl font-bold text-gold">{curriculum.length}</div>
-            <div className="text-[10px] text-slate-500 font-bold uppercase">إجمالي الدروس</div>
+         <div className="glass-panel !rounded-2xl px-10 flex flex-col justify-center items-center shrink-0 min-w-[200px]">
+            <div className="text-3xl font-bold text-gold">{curriculum.length}</div>
+            <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">درس متاح أوفلاين</div>
          </div>
       </div>
 
       {/* Curriculum Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
          {filtered.length > 0 ? (
            filtered.map((item) => (
-             <div key={item.id} className="bg-white/5 border border-white/5 p-6 rounded-3xl group hover:border-gold/30 transition-all relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-24 h-24 bg-sky-500/5 blur-3xl group-hover:bg-sky-500/10 transition-colors"></div>
+             <div key={item.id} className="glass-card p-8 group hover:border-gold/30 hover:shadow-2xl hover:shadow-gold/5 relative overflow-hidden flex flex-col">
+                <div className="absolute top-0 left-0 w-32 h-32 bg-sky-500/5 blur-3xl group-hover:bg-sky-500/10 transition-colors -z-10"></div>
                 
-                <div className="flex justify-between items-start mb-4">
-                   <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-xs font-bold">
-                      {item.grade}
+                <div className="flex justify-between items-start mb-6">
+                   <div className="px-3 py-1 rounded-lg bg-sky-500/10 text-sky-400 text-xs font-bold border border-sky-500/20">
+                      الصف {item.grade}
                    </div>
                    <button 
                      onClick={() => onDelete(item.id)}
-                     className="p-2 text-slate-600 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"
+                     className="p-2 text-slate-700 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"
                    >
                       <Trash2 className="w-4 h-4" />
                    </button>
                 </div>
 
-                <div className="space-y-1 mb-4">
-                   <div className="text-slate-500 text-[10px] uppercase tracking-widest font-bold">{item.unit}</div>
-                   <h3 className="text-white font-bold text-lg font-naskh">{item.title}</h3>
-                   <div className="flex gap-2 mt-2">
-                       <span className="px-2 py-0.5 bg-white/5 text-slate-400 rounded text-[9px] font-bold border border-white/5">
+                <div className="space-y-2 mb-8 flex-1">
+                   <div className="text-slate-500 text-xs font-bold uppercase tracking-widest font-naskh opacity-70">{item.unit}</div>
+                   <h3 className="text-2xl font-bold text-white font-naskh leading-tight group-hover:text-gold transition-colors">{item.title}</h3>
+                   <div className="pt-2">
+                       <span className="px-3 py-1 bg-white/5 text-slate-400 rounded-full text-[10px] font-bold border border-white/5">
                           {item.subject}
                        </span>
                    </div>
                 </div>
 
-                <div className="space-y-3 pt-4 border-t border-white/5">
+                <div className="space-y-4 pt-6 border-t border-white/5">
                    <div>
-                      <div className="text-[9px] text-slate-600 font-bold uppercase mb-2">الأهداف المستخرجة</div>
-                      <div className="flex flex-wrap gap-1">
-                         {item.objectives.slice(0, 2).map((obj, i) => (
-                           <span key={i} className="text-[10px] text-slate-400 bg-white/5 px-2 py-1 rounded-lg truncate max-w-full">
-                              • {obj}
-                           </span>
+                      <div className="text-[10px] text-slate-600 font-bold uppercase mb-3 tracking-widest">أهداف التعلم</div>
+                      <div className="space-y-2">
+                         {item.objectives.slice(0, 3).map((obj, i) => (
+                           <div key={i} className="flex gap-2 items-start text-xs text-slate-400 font-naskh line-clamp-1">
+                              <span className="text-gold">•</span> {obj}
+                           </div>
                          ))}
                       </div>
                    </div>
                    
-                   <div className="p-3 bg-gold/5 rounded-xl border border-gold/10 group-hover:border-gold/30 transition-all">
-                      <div className="text-[9px] text-gold font-bold uppercase mb-1 flex items-center gap-1">
-                         <Sparkles className="w-3 h-3" /> فكرة جيل ألفا
+                   <div className="p-4 bg-gold/5 rounded-2xl border border-gold/10 group-hover:border-gold/20 transition-all">
+                      <div className="text-[10px] text-gold font-bold uppercase mb-2 flex items-center gap-2">
+                         <Sparkles className="w-3 h-3" /> فكرة تفاعلية (جيل ألفا)
                       </div>
-                      <p className="text-slate-300 text-[10px] leading-relaxed italic">{item.suggestedIntro}</p>
+                      <p className="text-slate-300 text-xs leading-relaxed font-naskh italic">{item.suggestedIntro}</p>
                    </div>
                 </div>
              </div>
            ))
          ) : (
-           <div className="col-span-full py-20 flex flex-col items-center justify-center text-slate-600 space-y-4">
-              <Book className="w-16 h-16 opacity-20" />
-              <p className="font-naskh">لا توجد دروس تطابق بحثك أو لم يتم تحميل كتب بعد.</p>
+           <div className="col-span-full py-32 flex flex-col items-center justify-center space-y-6 glass-panel border-dashed border-2">
+              <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center border border-white/5">
+                 <Book className="w-10 h-10 text-slate-700" />
+              </div>
+              <div className="text-center">
+                 <h4 className="text-white font-bold text-xl font-naskh mb-2 text-slate-400">مكتبتك خاوية حالياً</h4>
+                 <p className="text-slate-600 text-sm font-naskh max-w-sm">
+                    ابدأ برفع أول كتاب مدرسي بصيغة PDF ليقوم نظام "نور" بتحليله وتوفير دروسه في قائمة التخطيط.
+                 </p>
+              </div>
            </div>
          )}
       </div>

@@ -57,7 +57,11 @@ export function useNoor() {
   };
 
   const saveStudent = async (student: any) => {
-    await NoorDB.saveStudent(student);
+    const updatedStudent = { ...student };
+    if (!updatedStudent.loginCode) {
+      updatedStudent.loginCode = `S-${Math.floor(1000 + Math.random() * 9000)}`;
+    }
+    await NoorDB.saveStudent(updatedStudent);
     await refreshAction();
   };
 

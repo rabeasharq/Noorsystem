@@ -36,13 +36,16 @@ export function StudentManager({ students, onSave, onDelete }: StudentManagerPro
     badges: []
   });
 
+  const generateCode = () => `S-${Math.floor(1000 + Math.random() * 9000)}`;
+
   const handleAdd = () => {
     if (!newStudent.name) return;
     onSave({
       ...newStudent,
       id: Date.now().toString(),
       points: 0,
-      badges: []
+      badges: [],
+      loginCode: generateCode()
     } as Student);
     setNewStudent({ ...newStudent, name: "" });
     setShowAdd(false);
@@ -157,6 +160,11 @@ export function StudentManager({ students, onSave, onDelete }: StudentManagerPro
                       <GraduationCap className="w-3 h-3" />
                       {GRADES[s.grade]?.label} ({s.classId})
                     </span>
+                    {s.loginCode && (
+                       <span className="flex items-center gap-1 text-gold bg-gold/5 px-2 py-0.5 rounded border border-gold/10">
+                         رمز الدخول: {s.loginCode}
+                       </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">

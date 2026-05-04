@@ -10,9 +10,27 @@
 
 @layer base {
   body {
-    @apply select-none antialiased bg-[#080c1a] text-[#e8f0ff];
+    @apply select-none antialiased bg-[#020617] text-slate-200;
     direction: rtl;
     font-family: var(--font-amiri);
+    background-image: 
+      radial-gradient(circle at 10% 20%, rgba(240, 192, 64, 0.05) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-white/5 backdrop-blur-[20px] border border-white/10 rounded-3xl;
+  }
+  
+  .glass-card {
+    @apply bg-white/[0.03] backdrop-blur-[10px] border border-white/[0.05] rounded-2xl transition-all duration-300;
+  }
+
+  .noor-glow {
+    @apply absolute pointer-events-none blur-[100px] opacity-20 rounded-full bg-gold/30;
   }
 }
 
